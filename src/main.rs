@@ -13,7 +13,8 @@ struct FlowNetwork {
     adj: Vec<Vec<usize>>,
     x: Vec<i32>,
     l: Vec<usize>,
-    q: VecDeque<usize>,
+    buckets: Vec<VecDeque<usize>>,
+    max_bucket: usize,
 }
 
 impl FlowNetwork {
@@ -27,7 +28,8 @@ impl FlowNetwork {
             adj: vec![Vec::new(); v],
             x: vec![0; v],
             l: vec![0; v],
-            q: VecDeque::new(),
+            buckets: vec![VecDeque::new(); 2 * v],
+            max_bucket: 0,
         }
     }
 
@@ -46,8 +48,15 @@ impl FlowNetwork {
     }
 
     fn calculate_flow(&mut self) {
-        while let Some(a) = self.q.pop_back() {
-            self.discharge(a);
+        loop {
+            while self.max_bucket > 0 && self.buckets[self.max_bucket].is_empty() {
+                self.max_bucket -= 1;
+            }
+            if let Some(a) = self.buckets[self.max_bucket].pop_back() {
+                self.discharge(a);
+            } else {
+                break;
+            }
         }
     }
 
@@ -104,7 +113,10 @@ impl FlowNetwork {
         self.x[a] -= delta;
         self.x[b] += delta;
         if b != self.t && self.x[b] <= delta {
-            self.q.push_back(b);
+            self.buckets[self.l[b]].push_back(b);
+            if self.l[b] > self.max_bucket {
+                self.max_bucket = self.l[b];
+            }
         }
     }
 
