@@ -46,7 +46,7 @@ impl FlowNetwork {
     }
 
     fn calculate_flow(&mut self) {
-        while let Some(a) = self.q.pop_front() {
+        while let Some(a) = self.q.pop_back() {
             self.discharge(a);
         }
     }
