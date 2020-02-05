@@ -72,17 +72,19 @@ impl FlowNetwork {
     }
 
     fn discharge(&mut self, a: usize) {
+        self.relabel(a);
         let mut i = 0;
-        while self.x[a] > 0 {
-            if i == self.adj[a].len() {
-                self.relabel(a);
-                i = 0;
-            } else {
-                let b = self.adj[a][i];
-                if self.l[a] == self.l[b] + 1 {
-                    self.push(a, b);
-                }
-                i += 1;
+        while i < self.adj[a].len() && self.x[a] > 0 {
+            let b = self.adj[a][i];
+            if self.l[a] == self.l[b] + 1 {
+                self.push(a, b);
+            }
+            i += 1;
+        }
+        if self.x[a] > 0 {
+            self.buckets[self.l[a]].push_back(a);
+            if self.l[a] > self.max_bucket {
+                self.max_bucket = self.l[a];
             }
         }
     }
