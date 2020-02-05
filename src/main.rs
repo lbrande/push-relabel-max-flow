@@ -1,7 +1,7 @@
 #[macro_use]
 mod kattis;
 
-use std::collections::VecDeque;
+use std::collections::BinaryHeap;
 use std::i32;
 
 struct FlowNetwork {
@@ -13,7 +13,7 @@ struct FlowNetwork {
     adj: Vec<Vec<usize>>,
     x: Vec<i32>,
     l: Vec<usize>,
-    q: VecDeque<usize>,
+    pq: BinaryHeap<usize>,
 }
 
 impl FlowNetwork {
@@ -27,7 +27,7 @@ impl FlowNetwork {
             adj: vec![Vec::new(); v],
             x: vec![0; v],
             l: vec![0; v],
-            q: VecDeque::new(),
+            pq: BinaryHeap::new(),
         }
     }
 
@@ -46,7 +46,7 @@ impl FlowNetwork {
     }
 
     fn calculate_flow(&mut self) {
-        while let Some(a) = self.q.pop_back() {
+        while let Some(a) = self.pq.pop() {
             self.discharge(a);
         }
     }
@@ -104,7 +104,7 @@ impl FlowNetwork {
         self.x[a] -= delta;
         self.x[b] += delta;
         if b != self.t && self.x[b] <= delta {
-            self.q.push_back(b);
+            self.pq.push(b);
         }
     }
 
