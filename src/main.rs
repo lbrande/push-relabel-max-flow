@@ -13,7 +13,7 @@ struct FlowNetwork {
     adj: Vec<Vec<usize>>,
     x: Vec<i32>,
     l: Vec<usize>,
-    pq: BinaryHeap<usize>,
+    pq: BinaryHeap<(usize, usize)>,
 }
 
 impl FlowNetwork {
@@ -46,7 +46,7 @@ impl FlowNetwork {
     }
 
     fn calculate_flow(&mut self) {
-        while let Some(a) = self.pq.pop() {
+        while let Some((_, a)) = self.pq.pop() {
             self.discharge(a);
         }
     }
@@ -104,7 +104,7 @@ impl FlowNetwork {
         self.x[a] -= delta;
         self.x[b] += delta;
         if b != self.t && self.x[b] <= delta {
-            self.pq.push(b);
+            self.pq.push((self.l[b], b));
         }
     }
 
